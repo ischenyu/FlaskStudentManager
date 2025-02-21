@@ -1,0 +1,261 @@
+openapi: 3.0.0
+info:
+  title: 学生扣分管理系统 API
+  description: 2班专用学生行为分管理系统
+  version: 1.0.0
+servers:
+  - url: http://192.168.10.115:5000/api
+    description: 开发环境
+  - url: https://student.alistnas.top/api
+    description: 生产环境
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+  schemas:
+    DeductionRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        student_name:
+          type: string
+          example: "张三"
+        points:
+          type: integer
+          minimum: 1
+          example: 2
+        reason:
+          type: string
+          example: "课堂纪律"
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T14:30:00Z"
+        operator:
+          type: string
+          example: "王老师"
+    Pagination:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeductionRecord'
+        total:
+          type: integer
+          example: 100
+        pages:
+          type: integer
+          example: 5
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+      example:
+        code: 404
+        message: "记录不存在"
+
+paths:
+  /deductions:
+    get:
+      tags:
+        - 扣分管理
+      summary: 获取扣分记录列表
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回分页列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pagination'
+        '400':
+          description: 参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: "参数格式错误"
+    post:
+      tags:
+        - 扣分管理
+      summary: 新增扣分记录
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - student_id
+                - points
+                - reason
+                - operator
+              properties:
+                student_id:
+                  type: integer
+                  example: 1
+                points:
+                  type: integer
+                  minimum: 1
+                  example: 2
+                reason:
+                  type: string
+                  example: "迟到"
+                operator:
+                  type: string
+                  example: "李老师"
+      responses:
+        '200':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+        '403':
+          description: 权限不足
+        '404':
+          description: 学生不存在
+
+  /deductions/{id}:
+    delete:
+      tags:
+        - 扣分管理
+      summary: 删除扣分记录
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 删除成功
+        '404':
+          description: 记录不存在
+
+  /deductions/statistics:
+    get:
+      tags:
+        - 统计报表
+      summary: 获取扣分统计
+      responses:
+        '200':
+          description: 统计结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  top_students:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        points:
+                          type: integer
+                  trend:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        count:
+                          type: integer
+                        points:
+                          type: integer
+              example:
+                top_students:
+                  - name: "李四"
+                    points: 15
+                trend:
+                  - date: "2023-10-01"
+                    count: 3
+                    points: 5
+
+  /students:
+    get:
+      tags:
+        - 学生管理
+      summary: 获取学生列表
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 学生列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        total_deduction:
+                          type: integer
+                  total:
+                    type: integer
+                  pages:
+                    type: integer
