@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig host="alistnas.top" id="4c0a0f49-8c64-4a64-a36b-b4230507b6cc" keyPath="E:\下载\alistnas.top_20250221174555_id_rsa" port="22" nameFormat="DESCRIPTIVE" username="root" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="1a77b140-7b38-467b-b904-aa251d201a4f" name="Ubuntu">
+        <fileTransfer accessType="SFTP" host="alistnas.top" port="22" sshConfigId="4c0a0f49-8c64-4a64-a36b-b4230507b6cc" sshConfig="root@alistnas.top:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" isUseSudo="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
