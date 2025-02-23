@@ -190,387 +190,44 @@
 
 <script setup>
 
-import { GithubOutlined } from '@ant-design/icons-vue';
-import { useDebounceFn } from '@vueuse/core';
-import { ref, reactive, onMounted, computed, nextTick } from 'vue';
-import 'ant-design-vue/dist/reset.css';
-import { message } from 'ant-design-vue';
-import { Modal } from 'ant-design-vue';
-import axios from 'axios';
-import dayjs from 'dayjs';
-import LineChart from './components/LineChart.vue';
+import { GithubOutlined } from '@ant-design/icons-vue'
+import LineChart from './components/LineChart.vue'
+import { useDeductionSystem } from './index.js'
 
+const {
+  // 响应式数据
+  columns,
+  deductions,
+  searchText,
+  modalVisible,
+  modalLoading,
+  tableLoading,
+  studentLoading,
+  trendDataLoading,
+  topStudentsLoading,
+  tablePagination,
+  formState,
+  studentList,
+  topStudents,
+  trendData,
+  formRef,
 
-// 密码输入状态
-const globalPassword = ref(localStorage.getItem('tempKey') || '');
+  // 计算属性
+  hasFormError,
 
-// API配置
-const api = axios.create({
-  baseURL: import.meta.env.PROD
-      ? 'https://student.alistnas.top/api'
-      : 'http://192.168.10.115:5000/api'
-});
-
-// 表格列配置
-const columns = [
-  { title: '学生姓名', dataIndex: 'student_name' },
-  { title: '扣分分值', dataIndex: 'points' },
-  { title: '扣分原因', dataIndex: 'reason' },
-  {
-    title: '操作时间',
-    dataIndex: 'created_at',
-    sorter: true
-  },
-  { title: '操作人', dataIndex: 'operator' },
-  {
-    title: '操作',
-    dataIndex: 'action',
-    width: 100
-  }
-];
-
-// 响应式数据
-const deductions = ref([]);
-const searchText = ref('');
-const modalVisible = ref(false);
-const modalLoading = ref(false);
-const tableLoading = ref(false);
-const studentLoading = ref(false);
-const trendDataLoading = ref(false);
-const topStudentsLoading = ref(false);
-
-const tablePagination = reactive({
-  current: 1,
-  pageSize: 20,
-  total: 0,
-  showSizeChanger: true,
-  showQuickJumper: true,
-  pageSizeOptions: ['5', '10', '20', '50'],
-  showTotal: total => `共 ${total} 条记录`
-});
-
-const formState = reactive({
-  student_id: undefined,
-  points: 1,
-  reason: '',
-  operator: '',
-  password: ''
-});
-
-const studentList = ref([]);
-const topStudents = ref([]);
-const trendData = ref([]);
-
-// 表单验证规则
-const formRules = {
-  student_id: [{
-    required: true,
-    message: '请选择学生',
-    trigger: 'change'
-  }],
-  points: [
-    { required: true, message: '请输入扣分分值' },
-    { type: 'number', min: 1, message: '分值必须大于0' }
-  ],
-  reason: [{
-    required: true,
-    message: '请输入扣分原因',
-    trigger: 'blur'  // 增加触发时机
-  }],
-  operator: [{
-    required: true,
-    message: '请输入操作人姓名',
-    trigger: 'blur'
-  }],
-  password: [{  // 新增密码验证规则
-    required: true,
-    message: '请输入有效密钥',
-    trigger: 'blur'
-  }]
-};
-
-// 初始化加载数据
-onMounted(() => {
-  fetchDeductions();
-  fetchStatistics();
-});
-
-// 获取扣分记录
-// 获取统计信息
-const fetchDeductions = async () => {
-  try {
-    // 初始化加载状态
-    tableLoading.value = true;
-
-    // 添加请求取消功能
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    // 请求参数处理
-    const params = {
-      page: tablePagination.current,
-      size: tablePagination.pageSize,  // 根据API文档确认参数名
-      keyword: searchText.value.trim() // 统一后端搜索参数命名
-    };
-
-    // 带API Key的请求配置
-    const res = await api.get('/deductions', {
-      params,
-      signal,
-      headers: {
-        'X-API-KEY': localStorage.getItem('apiKey') || ''
-      }
-    });
-
-    // 深度响应式数据更新（根据实际API结构调整）
-    if (res.data?.code === 200) {
-      deductions.value = res.data.data?.items || []; // 假设数据在data字段下
-      tablePagination.total = res.data.data?.total || 0;
-
-      // 检查分页合理性
-      if (tablePagination.current > 1 && deductions.value.length === 0) {
-        tablePagination.current = 1;
-        return fetchDeductions(); // 自动重新请求第一页
-      }
-    } else {
-      throw new Error(res.data?.message || 'Invalid response structure');
-    }
-  } catch (error) {
-    // 细化错误处理
-    if (error.name !== 'CanceledError') {
-      const errorMessage = error.response?.data?.message
-          || error.message
-          || '未知错误';
-
-      message.error(`数据加载失败: ${errorMessage}`);
-      console.error('扣分记录请求错误:', error);
-
-      // 重置分页数据
-      deductions.value = [];
-      tablePagination.total = 0;
-    }
-  } finally {
-    tableLoading.value = false;
-  }
-};
-
-// 表格分页/排序变化
-const handleTableChange = (pag) => {
-  tablePagination.current = pag.current;
-  tablePagination.pageSize = pag.pageSize;
-  fetchDeductions();
-};
-
-// 删除记录
-const deleteRecord = async (id) => {
-  if (!formState.password) {
-    message.error('请先在密码框中输入密钥');
-    return;
-  }
-  try {
-    await api.delete(`/deductions/${id}`, {
-      headers: { 'X-API-KEY': formState.password }
-    });
-    message.success('删除成功');
-    fetchDeductions();
-    fetchStatistics();
-  } catch (error) {
-    message.error('删除失败');
-  }
-};
-
-// 在setup中
-const debouncedSearch = useDebounceFn(async (name) => {
-  try {
-    studentLoading.value = true;
-    const res = await api.get('/students', {
-      params: {
-        search: name.trim(),
-        page: 1,
-        size: 10
-      }
-    });
-    studentList.value = res.data?.data?.items || [];
-  } catch (error) {
-    message.error(`学生搜索失败：${error.response?.data?.message || error.message}`);
-  } finally {
-    studentLoading.value = false;
-  }
-}, 300);
-
-
-// 搜索学生
-const handleStudentSearch = useDebounceFn(async (name) => {
-  try {
-    studentLoading.value = true;
-
-    const res = await api.get('/students', {
-      params: {
-        search: name.trim(),  // 保持与文档一致的参数名
-        page: 1,            // 明确分页参数
-        size: 10            // 控制返回结果数量
-      }
-    });
-
-    // 修正数据路径为 res.data.data.items ✅
-    studentList.value = res.data?.data?.items || [];
-
-    // 调试输出（开发环境使用）
-    if (import.meta.env.DEV) {
-      console.log('搜索学生结果:', {
-        params: { search: name },
-        response: res.data,
-        list: studentList.value
-      });
-    }
-  } catch (error) {
-    message.error(`学生搜索失败：${error.response?.data?.message || error.message}`);
-    console.error('学生搜索请求错误:', error);
-  } finally {
-    studentLoading.value = false;
-  }
-}, 300); // 300毫秒防抖
-
-// 在setup()中
-const formRef = ref(null);
-const formValid = ref(false);
-
-// 计算表单错误状态
-const hasFormError = computed(() => {
-  // 检查是否存在未通过验证的字段
-  return !formValid.value
-});
-
-// 修改表单验证处理逻辑，移除可能导致循环的验证逻辑
-const handleFormValidate = () => {
-  if (!formRef.value) return;
-
-  formRef.value
-      .validateFields()
-      .then(() => {
-        formValid.value = true;
-        console.log('表单验证通过'); // 调试用
-      })
-      .catch((errors) => {
-        formValid.value = false;
-        console.log('验证错误:', errors); // 调试用
-      });
-};
-
-// 提交表单
-const handleSubmit = async () => {
-  try {
-    modalLoading.value = true;
-    // 正确等待并获取响应结果
-    const response = await api.post('/deductions', formState, {
-      headers: { 'X-API-KEY': formState.password }
-    });
-
-    // 直接从响应数据中解构需要的信息
-    const { code, message: responseMessage } = response.data;
-
-    // 根据状态码进行逻辑处理
-    if (code === 200) {
-      message.success('扣分记录添加成功');
-      modalVisible.value = false;
-      resetForm();
-      await fetchDeductions();
-      await fetchStatistics();
-    } else if (code === 403) {
-      showModal_warning(responseMessage);  // 显示具体的权限错误提示
-    }
-  } catch (error) {
-    // 处理网络异常或服务端返回的HTTP错误状态码
-    const errorCode = error.response?.data?.code;
-    const errorMessage = error.response?.data?.message || '提交失败';
-
-    // 特别处理403状态码（HTTP层面的权限错误）
-    if (errorCode === 403 || error.response?.status === 403) {
-      showModal_warning(errorMessage);
-    } else {
-      message.error(errorMessage);
-    }
-    console.error('提交出错:', error);
-  } finally {
-    modalLoading.value = false;
-  }
-};
-
-// 重置表单
-const resetForm = () => {
-  formState.student_id = undefined;
-  formState.points = 1;
-  formState.reason = '';
-  formState.operator = '';
-};
-
-// 日期格式化
-const formatDate = (dateString) => {
-  return dayjs(dateString).format('YYYY-MM-DD HH:mm');
-};
-
-// 显示模态框
-// 在显示模态框时重置验证状态
-const showModal = () => {
-  modalVisible.value = true;
-  // 等待DOM更新后重置验证状态
-  nextTick(() => {
-    formValid.value = false;
-    formRef.value?.clearValidate();
-    // 调试输出
-    if (import.meta.env.DEV) {
-      console.log('表单初始验证状态:', formValid.value);
-    }
-  });
-};
-
-
-// 处理搜索
-const handleSearch = () => {
-  tablePagination.current = 1;
-  fetchDeductions();
-};
-
-// 获取统计信息
-const fetchStatistics = async () => {
-  try {
-    trendDataLoading.value = true;
-    topStudentsLoading.value = true;
-
-    const res = await api.get('/deductions/statistics', {
-      headers: {
-        'X-API-KEY': localStorage.getItem('apiKey') || ''
-      }
-    });
-
-    if (res.data?.code === 200) {
-      trendData.value = res.data.data?.trend || [];
-      // 修改为 + 字段转换
-      topStudents.value = (res.data.data?.top_students || []).map(item => ({
-        name: item.name,
-        points: Number(item.total_points) || 0 // 转换字段名并确保数值类型
-      }));
-    } else {
-      throw new Error(res.data?.message || 'Invalid response structure');
-    }
-  } catch (error) {
-    message.error(`统计信息加载失败: ${error.response?.data?.message || error.message}`);
-    console.error('统计信息请求错误:', error);
-  } finally {
-    trendDataLoading.value = false;
-    topStudentsLoading.value = false;
-  }
-};
-
-
-const open = ref(false);
-const showModal_warning = (message) => {
-  Modal.warning({
-    title: '提交失败',
-    content: message,
-  });
-};
-
+  // 方法
+  showModal,
+  handleSearch,
+  handleTableChange,
+  deleteRecord,
+  formatDate,
+  resetForm,
+  handleSubmit,
+  debouncedSearch,
+  handleFormValidate,
+  fetchStatistics,
+  showModal_warning
+} = useDeductionSystem()
 
 </script>
 
