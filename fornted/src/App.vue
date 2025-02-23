@@ -534,44 +534,34 @@ const handleSearch = () => {
 // 获取统计信息
 const fetchStatistics = async () => {
   try {
-    // 初始化加载状态
     trendDataLoading.value = true;
     topStudentsLoading.value = true;
 
-    // 添加请求取消功能
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    // 带API Key的请求配置
-    const res = await api.get('/deductions', {
-      signal,
+    const res = await api.get('/deductions/statistics', {
       headers: {
         'X-API-KEY': localStorage.getItem('apiKey') || ''
       }
     });
 
-    // 深度响应式数据更新
     if (res.data?.code === 200) {
       trendData.value = res.data.data?.trend || [];
-      topStudents.value = res.data.data?.topStudents || [];
+      // 修改为 + 字段转换
+      topStudents.value = (res.data.data?.top_students || []).map(item => ({
+        name: item.name,
+        points: Number(item.total_points) || 0 // 转换字段名并确保数值类型
+      }));
     } else {
       throw new Error(res.data?.message || 'Invalid response structure');
     }
   } catch (error) {
-    // 细化错误处理
-    if (error.name !== 'CanceledError') {
-      const errorMessage = error.response?.data?.message
-          || error.message
-          || '未知错误';
-
-      message.error(`统计信息加载失败: ${errorMessage}`);
-      console.error('统计信息请求错误:', error);
-    }
+    message.error(`统计信息加载失败: ${error.response?.data?.message || error.message}`);
+    console.error('统计信息请求错误:', error);
   } finally {
     trendDataLoading.value = false;
     topStudentsLoading.value = false;
   }
 };
+
 
 const open = ref(false);
 const showModal_warning = (message) => {
