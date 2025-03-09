@@ -12,6 +12,20 @@
       </a-button>
     </a-layout-header>
 
+    <div v-if="isWeChat" class="wechat-warning">
+    <a-result
+      status="warning"
+      title="请使用系统浏览器打开"
+      sub-title="检测到当前为微信内置浏览器，部分功能可能受限。因微信浏览器特殊问题，系统的css样式丢失"
+    >
+      <template #extra>
+        <div class="browser-guide">
+          <p>点击右上角 <span class="icon-more">...</span> 选择「在浏览器打开」</p>
+        </div>
+      </template>
+    </a-result>
+  </div>
+
     <a-layout-content class="content-wrapper">
       <!-- 统计卡片 -->
       <a-row :gutter="24" style="margin-bottom: 24px;">
@@ -117,21 +131,22 @@
         >
           <a-form-item label="学生" name="student_id">
             <a-select
-                v-model:value="formState.student_id"
-                show-search
-                placeholder="请选择学生"
-                :filter-option="false"
-                :not-found-content="studentLoading ? undefined : '暂无数据'"
-                @search="debouncedSearch"
-                :loading="studentLoading"
-                @blur="handleFormValidate"
+              v-model:value="formState.student_id"
+              show-search
+              placeholder="请选择学生"
+              :filter-option="false"
+              :not-found-content="studentLoading ? undefined : '暂无数据'"
+              @search="debouncedSearch"
+              @dropdownVisibleChange="(open) => open && handleDropdownSearch()"
+              :loading="studentLoading"
+              @blur="handleFormValidate"
             >
               <a-select-option
                   v-for="student in studentList"
                   :key="student.id"
                   :value="student.id"
               >
-                {{ student.name }}（当前扣分：{{ student.total_deduction }}）
+                {{ student.name }}(当前扣分：{{ student.total_deduction }})
               </a-select-option>
             </a-select>
           </a-form-item>
@@ -196,9 +211,10 @@
 
 <script setup>
 
-import { GithubOutlined } from '@ant-design/icons-vue'
+import { GithubOutlined, WarningFilled } from '@ant-design/icons-vue'
 import LineChart from './components/LineChart.vue'
 import { useDeductionSystem } from './index.js'
+import './assets/index.css'
 
 const {
   // 响应式数据
@@ -217,6 +233,8 @@ const {
   topStudents,
   trendData,
   formRef,
+  formRules,
+  isWeChat,
 
   // 计算属性
   hasFormError,
@@ -232,104 +250,8 @@ const {
   debouncedSearch,
   handleFormValidate,
   fetchStatistics,
-  showModal_warning
+  showModal_warning,
+  handleDropdownSearch
 } = useDeductionSystem()
 
 </script>
-
-<style scoped>
-.content-wrapper {
-  padding: 24px;
-  margin: 0 auto;
-  max-width: 1200px;
-
-  @media (max-width: 768px) {
-    padding: 12px;
-    max-width: 100%;
-  }
-}
-
-/* 卡片容器响应式 */
-.ant-row {
-  @media (max-width: 576px) {
-    margin-left: -8px !important;
-    margin-right: -8px !important;
-
-    .ant-col {
-      padding-left: 8px !important;
-      padding-right: 8px !important;
-    }
-  }
-}
-
-/* 表格响应式 */
-.ant-table-wrapper {
-  overflow-x: auto;
-
-  .ant-table {
-    min-width: 800px;
-
-    @media (max-width: 768px) {
-      font-size: 14px;
-    }
-  }
-}
-
-/* 搜索框区域响应式 */
-.ant-card .ant-input-search {
-  @media (max-width: 576px) {
-    width: 100% !important;
-    margin-bottom: 12px;
-  }
-}
-
-
-</style>
-
-<style scoped>
-.mobile-menu-button {
-  display: none;
-  margin-left: auto;
-
-  @media (max-width: 576px) {
-    display: block;
-  }
-}
-
-/* 隐藏PC端按钮 */
-.ant-card .ant-btn-primary {
-  @media (max-width: 576px) {
-    display: none;
-  }
-}
-
-.ant-modal {
-  @media (max-width: 576px) {
-    width: 95% !important;
-    max-width: none;
-    margin: 8px;
-
-    .ant-modal-content {
-      padding: 16px;
-    }
-  }
-}
-
-/* 固定底部定位 */
-.ant-layout-footer {
-  position: sticky;
-  bottom: 0;
-  z-index: 1;
-  background: #fff;
-  border-top: 1px solid #e8e8e8;
-}
-
-/* 响应式处理 */
-@media (max-width: 768px) {
-  .ant-layout-footer {
-    font-size: 14px;
-    padding: 16px;
-  }
-}
-
-</style>

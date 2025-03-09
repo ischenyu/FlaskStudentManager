@@ -1,0 +1,161 @@
+.mobile-menu-button {
+  display: none;
+  margin-left: auto;
+
+  @media (max-width: 576px) {
+    display: block;
+  }
+}
+
+/* 隐藏PC端按钮 */
+.ant-card .ant-btn-primary {
+  @media (max-width: 576px) {
+    display: none;
+  }
+}
+
+.ant-modal {
+  @media (max-width: 576px) {
+    width: 95% !important;
+    max-width: none;
+    margin: 8px;
+
+    .ant-modal-content {
+      padding: 16px;
+    }
+  }
+}
+
+/* 固定底部定位 */
+.ant-layout-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: #fff;
+  border-top: 1px solid #e8e8e8;
+}
+
+/* 响应式处理 */
+@media (max-width: 768px) {
+  .ant-layout-footer {
+    font-size: 14px;
+    padding: 16px;
+  }
+}
+
+.content-wrapper {
+  padding: 24px;
+  margin: 0 auto;
+  max-width: 1200px;
+
+  @media (max-width: 768px) {
+    padding: 12px;
+    max-width: 100%;
+  }
+}
+
+/* 卡片容器响应式 */
+.ant-row {
+  @media (max-width: 576px) {
+    margin-left: -8px !important;
+    margin-right: -8px !important;
+
+    .ant-col {
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+    }
+  }
+}
+
+/* 表格响应式 */
+.ant-table-wrapper {
+  overflow-x: auto;
+
+  .ant-table {
+    min-width: 800px;
+
+    @media (max-width: 768px) {
+      font-size: 14px;
+    }
+  }
+}
+
+/* 搜索框区域响应式 */
+.ant-card .ant-input-search {
+  @media (max-width: 576px) {
+    width: 100% !important;
+    margin-bottom: 12px;
+  }
+}
+
+/* 添加移动端响应式样式 */
+@media (max-width: 768px) {
+  .reason-cell {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+  }
+
+  /* 优化表格整体显示 */
+  :deep(.ant-table) {
+    overflow-x: auto;
+  }
+
+  /* 隐藏非关键列 */
+  :deep(.ant-table-thead) th:nth-child(3),
+  :deep(.ant-table-tbody) td:nth-child(3) {
+    display: none;
+  }
+}
+
+/* 微信提示样式 */
+.wechat-warning {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.browser-guide {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.browser-guide img {
+  width: 220px;
+  margin-bottom: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.icon-more {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: #000;
+  color: white;
+  border-radius: 4px;
+  line-height: 24px;
+  font-weight: bold;
+}
+
+:deep(.ant-result-title) {
+  font-size: 24px !important;
+  color: #333 !important;
+}
+
+:deep(.ant-result-subtitle) {
+  font-size: 16px !important;
+  color: #666 !important;
+}

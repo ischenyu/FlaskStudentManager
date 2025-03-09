@@ -279,6 +279,10 @@ export function useDeductionSystem() {
         })
     }
 
+    const isWeChat = computed(() => {
+        return /micromessenger/i.test(navigator.userAgent)
+    })
+
     return {
         // 响应式数据
         columns,
@@ -296,6 +300,8 @@ export function useDeductionSystem() {
         topStudents,
         trendData,
         formRef,
+        formRules,
+        isWeChat,
 
         // 计算属性
         hasFormError,
@@ -311,6 +317,7 @@ export function useDeductionSystem() {
         debouncedSearch,
         handleFormValidate,
         fetchStatistics,
-        showModal_warning
+        showModal_warning,
+        handleDropdownSearch
     }
 }
