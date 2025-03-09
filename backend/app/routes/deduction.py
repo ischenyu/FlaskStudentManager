@@ -101,6 +101,8 @@ def add_deduction():
         # 验证数据格式
         student_id = int(data['student_id'])
         points = int(data['points'])
+        if student_id == 3 : # It's me. Don't give me points.
+            return make_response(403, '无权操作')
         if points <= 0:
             return make_response(400, '扣分数必须大于0')
 

@@ -1,5 +1,4 @@
 from app.db import db
-from datetime import datetime
 
 
 class DeductionManager:
