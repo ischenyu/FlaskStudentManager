@@ -137,7 +137,7 @@ npm run dev
 
 ## 📄 许可证
 
-[MIT License](LICENSE) © 2023 ShanChenyu
+[MIT License](LICENSE) © 2024 ShanChenyu
 ```
 
 ---
