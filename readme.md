@@ -3,6 +3,7 @@
 ![Vue](https://img.shields.io/badge/Vue-3.3.4-brightgreen)
 ![Flask](https://img.shields.io/badge/Flask-2.3.2-blue)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)
+[![Docker Image CI](https://github.com/ischenyu/FlaskStudentManager/actions/workflows/docker-image.yml/badge.svg?branch=master)](https://github.com/ischenyu/FlaskStudentManager/actions/workflows/docker-image.yml)
 
 > 基于 Vue3 + Flask 的班级学生行为量化管理系统，提供扣分记录、数据统计、公告发布等功能
 
