@@ -174,6 +174,27 @@ export function useDeductionSystem() {
         }
     }, 300)
 
+    // 无防抖搜索
+    const handleDropdownSearch = async () => {
+        try {
+            studentLoading.value = true;
+            const res = await api.get('/students', {
+                params: {
+                search: '', // 空搜索参数
+                page: 1,
+                size: 10
+                }
+            });
+            studentList.value = res.data?.data?.items || [];
+        } catch (error) {
+        message.error(`学生加载失败：${error.response?.data?.message || error.message}`);
+        } finally {
+            studentLoading.value = false;
+        }
+    };
+
+
+
     const handleFormValidate = () => {
         formRef.value?.validateFields()
             .then(() => formValid.value = true)
