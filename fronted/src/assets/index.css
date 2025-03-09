@@ -205,3 +205,26 @@
     font-size: 12px;
   }
 }
+
+/* 公告弹窗 */
+.announce-modal {
+  /* 调整弹窗宽度 */
+  width: 80% !important;
+  max-width: 800px;
+
+  .markdown-body {
+    padding: 20px;
+    font-size: 16px;
+
+    /* 基础样式适配 */
+    h1 { font-size: 1.8em; }
+    h2 { font-size: 1.6em; }
+    ul { padding-left: 2em; }
+    code { background-color: #f3f4f4; }
+    pre {
+      background: #f6f8fa;
+      padding: 1em;
+      border-radius: 6px;
+    }
+  }
+}

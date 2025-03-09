@@ -12,6 +12,25 @@
       </a-button>
     </a-layout-header>
 
+    <!-- 新增公告弹窗 -->
+    <a-modal
+    v-model:visible="announceVisible"
+    title="系统公告"
+    :footer="null"
+    class="announce-modal"
+  >
+      <div v-if="announceData">
+    <div
+      class="markdown-body"
+      v-html="parseMarkdown(announceData.text)"
+    ></div>
+    <div class="announce-time">
+      {{ formatAnnounceDate(announceData.time) }}
+    </div>
+  </div>
+    <a-empty v-else description="暂无公告" />
+  </a-modal>
+
     <!-- 修改后的微信提示层 -->
     <div v-if="showWechatWarning" class="wechat-warning">
     <a-result
@@ -285,6 +304,7 @@ import {
 } from '@ant-design/icons-vue'
 import { useDeductionSystem } from './index.js'
 import { useServerStatus } from './GetServerStatus'
+import { useAnnounce } from './GetAnnounce.js'
 import './assets/index.css'
 
 const {
@@ -332,5 +352,16 @@ const {
   formatUptime
 } = useServerStatus()
 
+const {
+  announceVisible,
+  announceData,
+  parseMarkdown,
+  formatDate: formatAnnounceDate
+} = useAnnounce()
+
 
 </script>
+
+<style>
+@import 'https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css';
+</style>

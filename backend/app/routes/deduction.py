@@ -220,3 +220,26 @@ def get_statistics():
         current_app.logger.error(f"Statistics error: {str(e)}", exc_info=True)
         return make_response(500, "服务器内部错误")
 
+# deduction.py 新增部分
+@bp.route('/announce', methods=['GET'])
+def announce():
+    """获取最新公告"""
+    try:
+        with db.connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                SELECT text, time 
+                FROM announce 
+                ORDER BY time DESC 
+                LIMIT 1
+                """)
+                result = cursor.fetchone()
+                if result:
+                    return make_response(data={
+                        'text': result['text'],
+                        'time': result['time'].isoformat()
+                    })
+                return make_response(404, "暂无公告")
+    except Exception as e:
+        current_app.logger.error(f"获取公告失败: {str(e)}", exc_info=True)
+        return make_response(500, "服务器内部错误")

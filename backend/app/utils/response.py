@@ -1,12 +1,12 @@
 from flask import jsonify, current_app
 
 
-def make_response(code, message, data=None):
+def make_response(code=200, message='success', data=None):
     return jsonify({
         'code': code,
         'message': message,
         'data': data
-    })
+    }), code
 
 def validate_api_key(request):
     """生产环境API密钥验证"""
