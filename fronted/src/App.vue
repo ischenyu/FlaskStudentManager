@@ -12,19 +12,39 @@
       </a-button>
     </a-layout-header>
 
-    <div v-if="isWeChat" class="wechat-warning">
+    <!-- 修改后的微信提示层 -->
+    <div v-if="showWechatWarning" class="wechat-warning">
     <a-result
-      status="warning"
-      title="请使用系统浏览器打开"
-      sub-title="检测到当前为微信内置浏览器，部分功能可能受限。因微信浏览器特殊问题，系统的css样式丢失"
+    status="warning"
+    title="兼容性提示"
+    sub-title="微信浏览器可能影响功能体验"
     >
-      <template #extra>
-        <div class="browser-guide">
-          <p>点击右上角 <span class="icon-more">...</span> 选择「在浏览器打开」</p>
-        </div>
-      </template>
+    <template #extra>
+    <div class="browser-guide">
+    <p>(如css样式文件无法正常加载导致的界面错乱)</p>
+      <p>如果正常，可留在微信</p>
+    <p>点击右上角 <span class="icon-more">...</span> 选择「在浏览器打开」</p>
+    </div>
+
+    <!-- 新增操作按钮组 -->
+    <div class="action-buttons">
+    <a-button
+    type="primary"
+    @click="closeWechatWarning"
+    class="continue-btn"
+    >
+    继续访问
+    </a-button>
+    <a-button
+    @click="showModal_warning('请使用Safari/Chrome浏览器访问')"
+    class="open-browser-btn"
+    >
+    仍要打开浏览器
+    </a-button>
+    </div>
+    </template>
     </a-result>
-  </div>
+    </div>
 
     <a-layout-content class="content-wrapper">
       <!-- 统计卡片 -->
@@ -189,7 +209,50 @@
     </a-layout-content>
   </a-layout>
 
+  <!-- 新增状态栏 -->
+    <a-layout-footer class="status-footer">
+      <div v-if="systemInfo" class="status-container">
+        <a-tooltip title="服务器时间">
+          <div class="status-item">
+            <clock-circle-outlined />
+            {{ formatServerTime(systemInfo.current) }}
+          </div>
+        </a-tooltip>
 
+        <a-tooltip title="CPU使用率">
+          <div class="status-item">
+            <dashboard-outlined />
+            {{ systemInfo.cpu.toFixed(1) }}%
+          </div>
+        </a-tooltip>
+
+        <a-tooltip title="内存使用率">
+          <div class="status-item">
+            <pie-chart-outlined />
+            {{ systemInfo.memory.toFixed(1) }}%
+          </div>
+        </a-tooltip>
+
+        <a-tooltip title="系统负载">
+          <div class="status-item">
+            <line-chart-outlined />
+            {{ formatLoad(systemInfo.load) }}
+          </div>
+        </a-tooltip>
+
+        <a-tooltip title="运行时间">
+          <div class="status-item">
+            <poweroff-outlined />
+            {{ formatUptime(systemInfo.uptime) }}
+          </div>
+        </a-tooltip>
+      </div>
+
+      <div v-else class="status-loading">
+        <a-spin size="small" />
+        正在获取服务器状态...
+      </div>
+    </a-layout-footer>
 
   <a-layout-footer style="text-align: center; padding: 10px">
     <div style="color: rgba(0, 0, 0, 0.65)">
@@ -213,7 +276,15 @@
 
 import { GithubOutlined, WarningFilled } from '@ant-design/icons-vue'
 import LineChart from './components/LineChart.vue'
+import {
+  ClockCircleOutlined,
+  DashboardOutlined,
+  PieChartOutlined,
+  LineChartOutlined,
+  PoweroffOutlined
+} from '@ant-design/icons-vue'
 import { useDeductionSystem } from './index.js'
+import { useServerStatus } from './GetServerStatus'
 import './assets/index.css'
 
 const {
@@ -253,5 +324,13 @@ const {
   showModal_warning,
   handleDropdownSearch
 } = useDeductionSystem()
+
+const {
+  systemInfo,
+  formatServerTime,
+  formatLoad,
+  formatUptime
+} = useServerStatus()
+
 
 </script>

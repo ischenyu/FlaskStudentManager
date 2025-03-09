@@ -280,8 +280,20 @@ export function useDeductionSystem() {
     }
 
     const isWeChat = computed(() => {
-        return /micromessenger/i.test(navigator.userAgent)
+      return /micromessenger/i.test(navigator.userAgent)
     })
+
+    // 控制提示显示
+    const showWechatWarning = ref(
+        isWeChat.value && !localStorage.getItem('dismissWechatWarning')
+    )
+
+    // 关闭提示方法
+    const closeWechatWarning = () => {
+      showWechatWarning.value = false
+      localStorage.setItem('dismissWechatWarning', 'true')
+    }
+
 
     return {
         // 响应式数据
@@ -302,6 +314,8 @@ export function useDeductionSystem() {
         formRef,
         formRules,
         isWeChat,
+        showWechatWarning,
+        closeWechatWarning,
 
         // 计算属性
         hasFormError,

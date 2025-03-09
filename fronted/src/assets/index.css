@@ -159,3 +159,49 @@
   font-size: 16px !important;
   color: #666 !important;
 }
+
+
+/* 显示服务器状态 */
+.status-footer {
+  padding: 12px 24px;
+  background: #f0f2f5;
+  border-top: 1px solid #e8e8e8;
+}
+
+.status-container {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 13px;
+}
+
+.status-item:hover {
+  color: #1890ff;
+}
+
+.status-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 768px) {
+  .status-container {
+    gap: 16px;
+    justify-content: space-around;
+  }
+
+  .status-item {
+    font-size: 12px;
+  }
+}
