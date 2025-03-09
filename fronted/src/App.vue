@@ -81,6 +81,12 @@
             <template v-if="column.dataIndex === 'created_at'">
               {{ formatDate(record.created_at) }}
             </template>
+            <!-- 新增扣分原因列的特殊处理 -->
+            <template v-if="column.dataIndex === 'reason'">
+              <div class="reason-cell">
+                <span class="reason-content">{{ record.reason }}</span>
+              </div>
+            </template>
             <template v-if="column.dataIndex === 'action'">
               <a-popconfirm
                   title="确定要删除这条记录吗？"
