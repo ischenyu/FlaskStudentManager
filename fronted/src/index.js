@@ -1,4 +1,4 @@
-// index.js
+
 import { ref, reactive, onMounted, computed, nextTick } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import axios from 'axios'
@@ -9,7 +9,7 @@ import { Modal } from 'ant-design-vue'
 // API配置
 export const api = axios.create({
     baseURL: import.meta.env.PROD
-        ? 'https://student.alistnas.top/api'
+        ? '/api'
         : 'http://192.168.10.115:5000/api'
 })
 
