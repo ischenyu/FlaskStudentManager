@@ -1,8 +1,8 @@
 # 🎓 学生扣分管理系统
 
 ![Vue](https://img.shields.io/badge/Vue-3.3.4-brightgreen)
-![Flask](https://img.shields.io/badge/Flask-2.3.2-blue)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)
+![Flask](https://img.shields.io/badge/Flask-3.1.0-blue)
+![MySQL](https://img.shields.io/badge/MySQL-8.3-orange)
 [![Docker Image CI](https://github.com/ischenyu/FlaskStudentManager/actions/workflows/docker-image.yml/badge.svg?branch=master)](https://github.com/ischenyu/FlaskStudentManager/actions/workflows/docker-image.yml)
 
 > 基于 Vue3 + Flask 的班级学生行为量化管理系统，提供扣分记录、数据统计、公告发布等功能
@@ -43,8 +43,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-repo/student-deduction-system.git
-cd student-deduction-system
+git clone https://github.com/ischenyu/FlaskStudentManager.git
+cd FlaskStudentManager
 
 # 前端依赖
 cd fronted
@@ -105,7 +105,7 @@ npm run dev
 │   ├── src
 │   │   ├── assets        # 静态资源
 │   │   ├── components    # 通用组件
-│   │   └── index.js      # 核心逻辑
+│   │   ├── electeon      # 客户端
 │
 ├── backend               # 后端项目
 │   ├── app
@@ -138,7 +138,5 @@ npm run dev
 
 ## 📄 许可证
 
-[MIT License](LICENSE) © 2024 ShanChenyu
-```
+[MIT License](license) © 2025 Shan Chenyu
 
----

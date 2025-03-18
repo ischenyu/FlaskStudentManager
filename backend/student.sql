@@ -11,11 +11,22 @@
  Target Server Version : 80404 (8.4.4)
  File Encoding         : 65001
 
- Date: 08/03/2025 21:07:52
+ Date: 18/03/2025 18:01:52
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for announce
+-- ----------------------------
+DROP TABLE IF EXISTS `announce`;
+CREATE TABLE `announce`  (
+  `id` int NOT NULL,
+  `text` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `time` datetime NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for deduction_records
@@ -33,7 +44,7 @@ CREATE TABLE `deduction_records`  (
   INDEX `idx_deduction_created`(`created_at` ASC) USING BTREE,
   CONSTRAINT `deduction_records_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `deduction_records_chk_1` CHECK (`points` > 0)
-) ENGINE = InnoDB AUTO_INCREMENT = 80 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 102 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for students
