@@ -1,0 +1,20 @@
+appId: com.hutao.studentmanager
+productName: StudentManager
+directories:
+  output: release
+files:
+  - "dist/**/*"
+  - "electron/**/*"
+  - "package.json"
+extraMetadata:
+  main: electron/main.cjs
+win:
+  target:
+    target: nsis
+    arch: x64
+  icon: public/favicon.ico
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true

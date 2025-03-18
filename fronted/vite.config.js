@@ -20,5 +20,9 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 8000
+  },
+  base: './', // 确保静态资源使用相对路径
+  build: {
+    outDir: 'dist'
   }
 });
