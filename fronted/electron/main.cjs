@@ -90,7 +90,7 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-// 网络超时处理（示例）
+// 网络超时处理
 app.on('web-contents-created', (event, contents) => {
   contents.on('did-fail-load', (event, errorCode, errorDescription) => {
     console.error(`❌ 加载失败 (${errorCode}): ${errorDescription}`);
