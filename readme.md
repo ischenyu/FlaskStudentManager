@@ -106,6 +106,7 @@ npm run dev
 │   │   ├── assets        # 静态资源
 │   │   ├── components    # 通用组件
 │   │   ├── electeon      # 客户端
+│   │   └── index.js      # 核心逻辑
 │
 ├── backend               # 后端项目
 │   ├── app
@@ -139,4 +140,3 @@ npm run dev
 ## 📄 许可证
 
 [MIT License](license) © 2025 Shan Chenyu
-

@@ -3,9 +3,14 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        required: true
+        default: "latest"
 
 env:
   REGISTRY: docker.io
