@@ -3,6 +3,9 @@
     <!-- 头部导航 -->
     <a-layout-header style="background: #fff; padding: 0 24px; display: flex; align-items: center;">
       <h2 style="margin: 0">学生扣分管理系统</h2>
+      <div style="margin-left: auto; display: flex; gap: 16px">
+    </div>
+    <a-button @click="showModal">新增扣分</a-button>
       <a-button
           class="mobile-menu-button"
           type="primary"
@@ -14,11 +17,11 @@
 
     <!-- 新增公告弹窗 -->
     <a-modal
-    v-model:visible="announceVisible"
-    title="系统公告"
-    :footer="null"
-    class="announce-modal"
-  >
+      v-model:open="announceVisible"
+      title="系统公告"
+      :footer="null"
+      class="announce-modal"
+    >
       <div v-if="announceData">
     <div
       class="markdown-body"
@@ -33,33 +36,33 @@
 
     <!-- 修改后的微信提示层 -->
     <div v-if="showWechatWarning" class="wechat-warning">
-    <a-result
-    status="warning"
-    title="兼容性提示"
-    sub-title="微信浏览器可能影响功能体验"
-    >
-    <template #extra>
-    <div class="browser-guide">
-    <p>(如css样式文件无法正常加载导致的界面错乱)</p>
-      <p>如果正常，可留在微信</p>
-    <p>点击右上角 <span class="icon-more">...</span> 选择「在浏览器打开」</p>
+      <a-result
+        status="warning"
+        title="兼容性提示"
+        sub-title="微信浏览器可能影响功能体验"
+      >
+      <template #extra>
+      <div class="browser-guide">
+      <p>(如css样式文件无法正常加载导致的界面错乱)</p>
+        <p>如果正常，可留在微信</p>
+      <p>点击右上角 <span class="icon-more">...</span> 选择「在浏览器打开」</p>
     </div>
 
-    <!-- 新增操作按钮组 -->
+
     <div class="action-buttons">
-    <a-button
-    type="primary"
-    @click="closeWechatWarning"
-    class="continue-btn"
-    >
-    继续访问
-    </a-button>
-    <a-button
-    @click="showModal_warning('请使用Safari/Chrome浏览器访问')"
-    class="open-browser-btn"
-    >
-    仍要打开浏览器
-    </a-button>
+      <a-button
+        type="primary"
+        @click="closeWechatWarning"
+        class="continue-btn"
+      >
+      继续访问
+      </a-button>
+      <a-button
+        @click="showModal_warning('请使用Safari/Chrome浏览器访问')"
+        class="open-browser-btn"
+      >
+      仍要打开浏览器
+      </a-button>
     </div>
     </template>
     </a-result>
@@ -154,7 +157,7 @@
 
       <!-- 新增扣分模态框 -->
       <a-modal
-          v-model:visible="modalVisible"
+          v-model:open="modalVisible"
           title="新增扣分记录"
           :confirm-loading="modalLoading"
           :ok-button-props="{ disabled: hasFormError }"
@@ -288,7 +291,6 @@
   </a-layout-footer>
 
 
-
 </template>
 
 <script setup>
@@ -325,7 +327,8 @@ const {
   trendData,
   formRef,
   formRules,
-  isWeChat,
+  showWechatWarning,
+  closeWechatWarning,
 
   // 计算属性
   hasFormError,
