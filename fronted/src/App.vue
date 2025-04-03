@@ -122,6 +122,13 @@
               @search="handleSearch"
           />
           <a-button type="primary" @click="showModal">新增扣分</a-button>
+          <a-button 
+            type="primary" 
+            @click="handleExport"
+            :loading="exportLoading"
+            ghost
+            icon="download"
+          >导出报表</a-button>
         </div>
 
         <!-- 数据表格 -->
@@ -345,7 +352,9 @@ const {
   handleFormValidate,
   fetchStatistics,
   showModal_warning,
-  handleDropdownSearch
+  handleDropdownSearch,
+  exportLoading,
+  handleExport,
 } = useDeductionSystem()
 
 const {

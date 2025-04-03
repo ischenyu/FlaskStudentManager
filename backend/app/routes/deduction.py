@@ -1,7 +1,15 @@
+import os
+import pandas as pd
+from flask import send_file, after_this_request
+from datetime import datetime, timedelta
+from tempfile import gettempdir
 from flask import Blueprint, request, current_app
 from app.db import db  # 使用之前定义的PyMySQL连接工具
 from app.utils.response import make_response, validate_api_key
 from datetime import datetime, timedelta
+from sqlalchemy import create_engine, text
+import xlsxwriter
+import pymysql
 
 bp = Blueprint('deduction', __name__, url_prefix='/api/deductions')
 
@@ -243,3 +251,132 @@ def announce():
     except Exception as e:
         current_app.logger.error(f"获取公告失败: {str(e)}", exc_info=True)
         return make_response(500, "服务器内部错误")
+    
+@bp.route('/export', methods=['GET'])
+def export_records():
+    """导出扣分记录报表（生产环境优化版）"""
+    if not validate_api_key(request):
+        return make_response(403, '无权操作')
+
+    try:
+        # 生成唯一文件名
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        filename = f"deduction_report_{timestamp}.xlsx"
+        filepath = os.path.join(gettempdir(), filename)
+
+        # 创建SQLAlchemy引擎
+        engine = create_engine(current_app.config['SQLALCHEMY_DATABASE_URI'])
+
+        # 获取明细数据
+        base_query = text("""
+        SELECT 
+            dr.id as 记录ID,
+            s.name as 姓名,
+            s.student_number as 学号,
+            dr.points as 扣分分值,
+            dr.reason as 扣分事由,
+            dr.operator as 操作人,
+            dr.created_at as 记录时间
+        FROM deduction_records dr
+        INNER JOIN students s ON dr.student_id = s.id
+        WHERE s.class_number = '2'
+        """)
+        
+        with engine.connect() as conn:
+            # 读取主数据
+            df_main = pd.read_sql(base_query, conn)
+
+            # 修复存储过程结果集处理
+            raw_conn = engine.raw_connection()
+            try:
+                cursor = raw_conn.cursor(pymysql.cursors.DictCursor)
+                cursor.callproc('GetDeductionStats')
+                
+                # 获取第一个结果集（总扣分TOP10）
+                df_top = pd.DataFrame(
+                    cursor.fetchall(),
+                    columns=['姓名', '总扣分']
+                )
+                
+                # 切换到第二个结果集（需要MySQL驱动支持）
+                if cursor.nextset():
+                    df_trend = pd.DataFrame(
+                        cursor.fetchall(),
+                        columns=['日期', '扣分次数', '总扣分']
+                    )
+                else:
+                    df_trend = pd.DataFrame(columns=['日期', '扣分次数', '总扣分'])
+                
+                # 必须提交事务
+                raw_conn.commit()
+            finally:
+                cursor.close()
+                raw_conn.close()
+
+        # 使用ExcelWriter创建多sheet报表
+        with pd.ExcelWriter(filepath, engine='xlsxwriter') as writer:
+            # 写入数据
+            df_main.to_excel(writer, sheet_name='扣分明细', index=False)
+            df_top.to_excel(writer, sheet_name='扣分TOP10', index=False)
+            df_trend.to_excel(writer, sheet_name='扣分趋势', index=False)
+
+            # 获取工作簿对象
+            workbook = writer.book
+            header_format = workbook.add_format({
+                'bold': True,
+                'text_wrap': True,
+                'valign': 'vcenter',
+                'fg_color': '#D7E4BC',
+                'border': 1
+            })
+
+            # 为每个工作表单独设置格式
+            for sheet_name, df in [
+                ('扣分明细', df_main),
+                ('扣分TOP10', df_top), 
+                ('扣分趋势', df_trend)
+            ]:
+                worksheet = writer.sheets[sheet_name]
+                
+                # 设置表头格式
+                worksheet.set_row(0, 20, header_format)
+                
+                # 自动调整列宽（考虑中文宽度）
+                for idx, column in enumerate(df.columns):
+                    # 计算列标题宽度（中文按2字符计算）
+                    header_width = max(len(str(column)) * 2, 10)
+                    
+                    # 计算内容最大宽度
+                    if df[column].dtype == object:
+                        content_width = df[column].astype(str).map(lambda x: len(x)*2).max()
+                    else:
+                        content_width = 10
+                        
+                    # 取最大宽度并设置
+                    max_width = max(header_width, content_width) + 2  # 加padding
+                    worksheet.set_column(idx, idx, max_width / 2)  # 转换为英文字符单位
+
+                # 添加自动筛选
+                worksheet.autofilter(0, 0, 0, len(df.columns)-1)
+
+        @after_this_request
+        # 注册文件清理回调
+        def cleanup(response):
+            try:
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+            except Exception as e:
+                current_app.logger.error(f"文件清理失败: {str(e)}")
+            return response
+
+        return send_file(
+            filepath,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=filename
+        )
+
+    except Exception as e:
+        current_app.logger.error(f"导出失败: {str(e)}", exc_info=True)
+        return make_response(500, "报表生成失败")
+
