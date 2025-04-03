@@ -228,3 +228,20 @@
     }
   }
 }
+
+/* 导出按钮悬停动画 */
+.export-btn:hover {
+  transform: translateY(-2px);
+  transition: all 0.2s ease-in-out;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .export-btn span {
+    display: none;
+  }
+  .export-btn .anticon {
+    margin-right: 0 !important;
+  }
+}
+

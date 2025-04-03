@@ -7,6 +7,8 @@
 
 > 基于 Vue3 + Flask 的班级学生行为量化管理系统，提供扣分记录、数据统计、公告发布等功能
 
+> API文档: q573zqg6s1.apifox.cn
+
 ## 🌟 功能特性
 
 ### 📊 核心功能
@@ -28,8 +30,29 @@
 ⚙️ 后端技术栈
 - Flask RESTful API
 - PyMySQL 数据库操作
-- JWT 令牌验证（预留接口）
+- JWT 令牌验证
 - Nginx 反向代理配置
+```
+
+
+## 📂 项目结构
+
+```bash
+.
+├── fronted                # 前端项目
+│   ├── src
+│   │   ├── assets        # 静态资源
+│   │   ├── components    # 通用组件
+│   │   ├── electeon      # 客户端
+│   │   └── index.js      # 核心逻辑
+│
+├── backend               # 后端项目
+│   ├── app
+│   │   ├── routes        # 路由模块
+│   │   ├── utils         # 工具函数
+│   │   └── __init__.py   # 应用工厂
+│   ├── student.sql       # 数据库初始化文件
+│   └── requirements.txt  # Python依赖
 ```
 
 ## 🚀 快速开始
@@ -71,14 +94,13 @@ mysql -u root -p student < backend/student.sql
 在 `backend` 目录创建 `.env` 文件：
 ```ini
 # MySQL 配置
-MYSQL_HOST=localhost
-MYSQL_PORT=3306
-MYSQL_USER=root
-MYSQL_PASSWORD=your_password
-MYSQL_DB=student
+PROD_DATABASE_URI=mysql+pymysql://student:Dingtalk1234561017@192.168.10.115:3306/student?charset=utf8mb4
+ADMIN_API_KEY=1017
 
-# API安全配置
-API_SECRET_KEY=your_secret_key_here
+DB_HOST=192.168.10.115
+DB_USER=student
+DB_PASSWORD=Dingtalk1234561017
+DB_NAME=student
 ```
 
 ## 🖥 运行项目
@@ -90,32 +112,33 @@ flask run --host=0.0.0.0 --port=5000
 ```
 
 ### 前端服务
+
+修改 ` fronted/src/index.js:13 `中的 ` http://192.168.10.115:5000 ` 改为开发服务器地址
+```javascript
+10| export const api = axios.create({
+11|     baseURL: import.meta.env.PROD
+12|         ? '/api'
+13|         : 'http://192.168.10.115:5000/api'
+14| })
+```
+
 ```bash
 cd fronted
+npm install
 npm run dev
 ```
 
-访问地址：http://localhost:5173
+访问地址：http://localhost:3000
 
-## 📂 项目结构
+### 部署建议
 
+**后端**生产环境部署使用`gunicorn`
+启动命令：
 ```bash
-.
-├── fronted                # 前端项目
-│   ├── src
-│   │   ├── assets        # 静态资源
-│   │   ├── components    # 通用组件
-│   │   ├── electeon      # 客户端
-│   │   └── index.js      # 核心逻辑
-│
-├── backend               # 后端项目
-│   ├── app
-│   │   ├── routes        # 路由模块
-│   │   ├── utils         # 工具函数
-│   │   └── __init__.py   # 应用工厂
-│   ├── student.sql       # 数据库初始化文件
-│   └── requirements.txt  # Python依赖
+../venv/bin/python3 -m gunicorn -w 4 -b <adderss>:<port> wsgi:app
 ```
+
+
 
 ## 📌 注意事项
 

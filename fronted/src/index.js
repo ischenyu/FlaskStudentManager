@@ -294,6 +294,51 @@ export function useDeductionSystem() {
       localStorage.setItem('dismissWechatWarning', 'true')
     }
 
+    const exportLoading = ref(false)
+  
+    // 导出处理方法
+    const handleExport = async () => {
+        try {
+          exportLoading.value = true
+          const response = await api.get('/deductions/export', {
+            responseType: 'blob',
+            headers: { 'X-API-KEY': formState.password }
+          })
+      
+          // 安全获取文件名
+          const disposition = response.headers['content-disposition'] || ''
+          let filename = 'deduction_report.xlsx' // 默认文件名
+          
+          const filenameMatch = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
+          if (filenameMatch && filenameMatch[1]) { 
+            filename = decodeURIComponent(filenameMatch[1].replace(/['"]/g, ''))
+          }
+      
+          // 创建下载链接
+          const url = window.URL.createObjectURL(new Blob([response.data]))
+          const link = document.createElement('a')
+          link.href = url
+          link.setAttribute('download', filename)
+          document.body.appendChild(link)
+          link.click()
+          
+          // 清理DOM
+          document.body.removeChild(link)
+          window.URL.revokeObjectURL(url)
+      
+          message.success('报表下载已开始')
+        } catch (error) {
+          console.error('导出失败详情:', error)
+          let errorMsg = error.response?.data?.message || error.message
+          if (error.response?.status === 403) {
+            errorMsg = '导出权限不足，请联系管理员'
+          }
+          message.error(`导出失败: ${errorMsg}`)
+        } finally {
+          exportLoading.value = false
+        }
+      }
+      
 
     return {
         // 响应式数据
@@ -332,6 +377,8 @@ export function useDeductionSystem() {
         handleFormValidate,
         fetchStatistics,
         showModal_warning,
-        handleDropdownSearch
+        handleDropdownSearch,
+        exportLoading,
+        handleExport,
     }
 }
