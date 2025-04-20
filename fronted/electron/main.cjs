@@ -1,6 +1,6 @@
 // electron/main.cjs
 
-const API_BASE = process.env.API_BASE || 'http://192.168.10.115:5000'
+const API_BASE = process.env.API_BASE || 'https://student4.alistnas.top:1145'
 
 const { app, BrowserWindow, session } = require('electron');
 const path = require('path');

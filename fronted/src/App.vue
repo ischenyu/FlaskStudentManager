@@ -72,7 +72,7 @@
       <!-- 统计卡片 -->
       <a-row :gutter="24" style="margin-bottom: 24px;">
         <a-col :span="12" :xs="24" :sm="24" :md="12" :lg="12">
-          <a-card title="扣分趋势">
+          <a-card title="扣分趋势" class="stat-card">
             <template v-if="trendDataLoading">
               <a-skeleton active />
             </template>
@@ -86,14 +86,15 @@
           </a-card>
         </a-col>
         <a-col :span="12" :xs="24" :sm="24" :md="12" :lg="12">
-          <a-card title="扣分TOP榜">
+          <a-card title="扣分TOP榜" class="stat-card">
             <template v-if="topStudentsLoading">
               <a-skeleton active />
             </template>
             <a-list
-                v-else
-                item-layout="horizontal"
-                :data-source="topStudents"
+              id="top-list"
+              v-else
+              item-layout="horizontal" 
+              :data-source="topStudents"
             >
               <template #renderItem="{ item }">
                 <a-list-item>
