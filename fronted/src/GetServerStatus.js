@@ -2,6 +2,13 @@ import axios from 'axios'
 import { ref, onMounted, onUnmounted } from 'vue'
 import dayjs from "dayjs"
 
+// API配置
+export const api = axios.create({
+  baseURL: import.meta.env.PROD
+      ? '/api'
+      : 'http://192.168.10.115:5000/api'
+})
+
 // 改为导出函数形式
 export function useServerStatus() {
   const systemInfo = ref(null)
@@ -9,7 +16,7 @@ export function useServerStatus() {
 
   const fetchSystemInfo = async () => {
     try {
-      const res = await axios.get('https://api.alistnas.top/system_info')
+      const res = await api.get('system/status')  //('https://api.alistnas.top/system_info')
       systemInfo.value = res.data
     } catch (error) {
       console.error('获取服务器状态失败:', error)

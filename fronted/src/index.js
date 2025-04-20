@@ -113,19 +113,26 @@ export function useDeductionSystem() {
                 size: tablePagination.pageSize,
                 keyword: searchText.value.trim()
             }
-
+    
             const res = await api.get('/deductions', {
                 params,
                 headers: {
                     'X-API-KEY': localStorage.getItem('apiKey') || ''
                 }
             })
-
+    
             if (res.data?.code === 200) {
                 deductions.value = res.data.data?.items || []
-                tablePagination.total = res.data.data?.total || 0
-
-                if (tablePagination.current > 1 && deductions.value.length === 0) {
+                tablePagination.total = res.data.data?.pagination?.total || 0
+    
+                // 校正当前页码
+                const totalPages = Math.ceil(tablePagination.total / tablePagination.pageSize)
+                if (tablePagination.current > totalPages) {
+                    tablePagination.current = totalPages || 1
+                    return fetchDeductions()
+                }
+    
+                if (deductions.value.length === 0 && tablePagination.current > 1) {
                     tablePagination.current = 1
                     return fetchDeductions()
                 }

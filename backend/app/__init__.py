@@ -15,9 +15,11 @@ def create_app(config_name='production'):
 
     # 注册蓝图
     from app.routes.deduction import bp as deduction_bp
-    from app.routes.student import bp as student_bp  # 新增
+    from app.routes.student import bp as student_bp
+    from app.routes.system import bp as system_bp
     app.register_blueprint(deduction_bp)
-    app.register_blueprint(student_bp)  # 新增
+    app.register_blueprint(student_bp)
+    app.register_blueprint(system_bp)
 
     # 生产环境健康检查
     @app.route('/health')

@@ -245,3 +245,23 @@
   }
 }
 
+/* 添加在文件最后 */
+.ant-card.stat-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ant-card.stat-card .ant-card-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#top-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 400px; /* 根据实际图表高度调整 */
+}
+
